@@ -1,0 +1,20 @@
+# Folder yang TIDAK boleh masuk Git
+node_modules/
+
+# File environment rahasia
+.env
+
+# Logs (opsional)
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Folder testing output / coverage (opsional)
+coverage/
+
+# Build folder (kalau nanti kamu ada build)
+dist/
+
+# VSCode settings (opsional biar repo bersih)
+.vscode/
+# 
