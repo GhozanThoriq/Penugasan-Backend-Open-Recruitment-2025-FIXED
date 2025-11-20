@@ -1,0 +1,66 @@
+###############################################
+# ROOT TEST (cek server hidup)
+###############################################
+GET http://localhost:3000/
+
+
+###############################################
+# REGISTER (buat akun baru)
+###############################################
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@mail.com",
+  "password": "password123"
+}
+
+
+###############################################
+# LOGIN (dapat Bearer Token)
+###############################################
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@mail.com",
+  "password": "password123"
+}
+
+
+###############################################
+# ME (Protected Route)
+# NOTE:
+# GANTI <TOKEN_KAMU> dengan token login
+###############################################
+GET http://localhost:3000/api/auth/me
+Authorization: Bearer <TOKEN_KAMU>
+
+###############################################
+# TEST TANPA TOKEN (harus error 401)
+###############################################
+GET http://localhost:3000/api/auth/me
+
+
+###############################################
+# TEST REGISTER INVALID (email/password salah)
+###############################################
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "invalid-email",
+  "password": "123"
+}
+
+
+###############################################
+# TEST LOGIN PASSWORD SALAH (should 401)
+###############################################
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@mail.com",
+  "password": "wrongpassword"
+}

@@ -1,45 +1,44 @@
-# 🛡️ Penugasan Backend Open Recruitment 2025:
+📚 Dokumentasi API — Persiapan Backend
 
-Proyek RESTful API ini dikembangkan menggunakan **Node.js, Express.js, dan Mongoose (MongoDB)** dengan fokus utama pada **Keamanan Aplikasi (AppSec)** dan **Code Readability (Arsitektur MVC)**.
+Untuk kemudahan pengujian API, tersedia Postman Collection yang sudah disiapkan. Collection ini dilengkapi script otomatis untuk menyimpan token JWT setelah login, sehingga request selanjutnya bisa langsung menggunakan token tersebut.
 
-## 1. Instalasi dan Setup Proyek
 
-### A. Prasyarat
 
-* **Node.js dan NPM** terinstal.
-* **MongoDB** berjalan (lokal atau menggunakan layanan *cloud* seperti MongoDB Atlas).
+📥 Download Postman Collection
+(Import ke Postman → pilih tab “File” → upload.)
 
-### B. Instalasi Dependencies
 
-Jalankan perintah berikut di *root directory* proyek:
-```bash
-npm install
 
-Konfigurasi Environment (File .env)
-PORT=3000
-MONGODB_URI=[LINK_MONGO_DB_KAMU]
-JWT_SECRET=supersecretkeyyangpanjangdankompleks
+🧩 Daftar Endpoint Utama
+🔓 Public Endpoints
+GET; Endpoint: / ;Deskripsi = Health Check ;Auth ❌
 
-### D. Menjalankan Server (Development Mode)
-npm run dev
-Server akan berjalan di http://localhost:3000
+POST; Endpoint: /api/auth/register; Deskripsi: Registrasi user baru; Body JSON: { "email": "...", "password": "..." } ;Auth ❌
 
-### Struktur Folder
-src/
-├── config/              # ⚙️ Konfigurasi dasar (MongoDB connection, JWT setup)
-│   └── db.js            # Inisialisasi koneksi Mongoose ke MongoDB
-├── controllers/         # 🧠 Logika Bisnis: Fungsi yang menangani permintaan dan mengirim respons
-│   ├── authController.js  # Register, Login, Logout
-│   └── userController.js  # Mendapatkan/Mengubah data pengguna
-├── middleware/          # 🛡️ Fungsi Keamanan & Validasi (JWT Auth, Anti-SQL Injection)
-│   └── authMiddleware.js  # Middleware untuk verifikasi JWT
-├── models/              # 🏛️ Skema Data Mongoose
-│   ├── User.js          # Skema Model Pengguna (dengan bcrypt hashing)
-│   └── [Model Lain].js  # Model data lainnya
-└── routes/              # 🧭 Routing Endpoint
-    ├── authRoutes.js    # Rute untuk /api/auth/...
-    └── userRoutes.js    # Rute untuk /api/users/...
+POST; Endpoint: /api/auth/login; Deskripsi: Login & dapatkan token JWT; Body JSON: { "email": "...", "password": "..." } ;Auth ❌
+🔐 Protected Endpoints
+GET; Endpoint: /api/auth/me ;Deskripsi = Mendapatkan data user berdasarkan token; Header: Authorization: Bearer <token> ;Auth ✅
+Catatan:
+Akses endpoint yang dilindungi membutuhkan header:
+Authorization: Bearer <TOKEN_KAMU>
 
-index.js                   # 🚀 Entry point utama (inisialisasi Express dan DB)
-package.json               # Daftar dependencies dan scripts
-.env                       # Variabel lingkungan
+
+
+
+🧪 Testing Dengan Postman
+Import file postman_collection.json
+Atur environment Postman:
+baseUrl = http://localhost:3000
+token = (kosong, akan terisi otomatis)
+Jalankan request Login
+Token dari response akan otomatis tersimpan ke environment
+Jalankan GET /api/auth/me
+Semua sudah otomatis, tinggal klik "Send".
+
+🛠 Tech Stack
+Node.js + Express
+MongoDB Atlas + Mongoose
+JWT Authentication
+Bcrypt, Helmet, CORS, Rate Limit
+Express-validator
+VSCode REST Client / Postman
