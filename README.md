@@ -1,44 +1,65 @@
-📚 Dokumentasi API — Persiapan Backend
-
-Untuk kemudahan pengujian API, tersedia Postman Collection yang sudah disiapkan. Collection ini dilengkapi script otomatis untuk menyimpan token JWT setelah login, sehingga request selanjutnya bisa langsung menggunakan token tersebut.
+DOKUMENTASI API (POSTMAN)
 
 
-
-📥 Download Postman Collection
-(Import ke Postman → pilih tab “File” → upload.)
-
+Base URL
+http://localhost:3000
 
 
-🧩 Daftar Endpoint Utama
-🔓 Public Endpoints
-GET; Endpoint: / ;Deskripsi = Health Check ;Auth ❌
-
-POST; Endpoint: /api/auth/register; Deskripsi: Registrasi user baru; Body JSON: { "email": "...", "password": "..." } ;Auth ❌
-
-POST; Endpoint: /api/auth/login; Deskripsi: Login & dapatkan token JWT; Body JSON: { "email": "...", "password": "..." } ;Auth ❌
-🔐 Protected Endpoints
-GET; Endpoint: /api/auth/me ;Deskripsi = Mendapatkan data user berdasarkan token; Header: Authorization: Bearer <token> ;Auth ✅
-Catatan:
-Akses endpoint yang dilindungi membutuhkan header:
-Authorization: Bearer <TOKEN_KAMU>
+GET/Health Check   --->    Public Endpoints
+Response
+{ "message": "API Works!" }
 
 
+POST /api/auth/register   --->   Registrasi user baru.
+Body
+{
+  "email": "email@example.com",
+  "password": "password123"
+}
 
 
-🧪 Testing Dengan Postman
-Import file postman_collection.json
-Atur environment Postman:
-baseUrl = http://localhost:3000
-token = (kosong, akan terisi otomatis)
-Jalankan request Login
-Token dari response akan otomatis tersimpan ke environment
-Jalankan GET /api/auth/me
-Semua sudah otomatis, tinggal klik "Send".
+POST /api/auth/login   --->    Login dan mendapatkan JWT.
+Body
+{
+  "email": "email@example.com",
+  "password": "password123"
+}
+Response
+{
+  "token": "<jwt>",
+  "refreshToken": "<refresh_token>"
+}
 
-🛠 Tech Stack
-Node.js + Express
-MongoDB Atlas + Mongoose
-JWT Authentication
-Bcrypt, Helmet, CORS, Rate Limit
-Express-validator
-VSCode REST Client / Postman
+
+GET /api/auth/me  ---> Protected Endpoints (Mengambil data user login.)
+Header
+Authorization: Bearer <token>
+
+
+POST /api/auth/refresh   --->    Mengambil token baru menggunakan refresh token.
+Body
+{
+  "refreshToken": "<refresh_token>"
+}
+
+
+POST /api/auth/logout   --->    Logout dan menonaktifkan refresh token.
+Body
+{
+  "refreshToken": "<refresh_token>"
+}
+
+
+POST /api/auth/request-reset    --->    Reset Password
+Body
+{
+  "email": "email@example.com"
+}
+
+
+POST /api/auth/reset-password     --->     Reset password menggunakan token reset
+Body
+{
+  "token": "<reset_token>",
+  "password": "newPassword123"
+}
