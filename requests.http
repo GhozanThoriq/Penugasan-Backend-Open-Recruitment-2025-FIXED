@@ -1,66 +1,82 @@
+# Environment note:
+# set baseUrl in .rest-client.env.json OR replace {{baseUrl}} with http://localhost:3000
+
 ###############################################
 # ROOT TEST (cek server hidup)
 ###############################################
-GET http://localhost:3000/
-
+GET {{baseUrl}}/
+Accept: application/json
 
 ###############################################
 # REGISTER (buat akun baru)
 ###############################################
-POST http://localhost:3000/api/auth/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
+Accept: application/json
 
 {
   "email": "test@mail.com",
   "password": "password123"
 }
 
+# Expected: 201 or 200 (tergantung implementasi) / response body: { user: {...} } atau message
 
 ###############################################
 # LOGIN (dapat Bearer Token)
 ###############################################
-POST http://localhost:3000/api/auth/login
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
+Accept: application/json
 
 {
   "email": "test@mail.com",
   "password": "password123"
 }
 
+# Expected: 200 + response body contains token (e.g. { "token": "..." })
+# Copy token from response and paste ke below request's Authorization header (or set env)
 
 ###############################################
 # ME (Protected Route)
-# NOTE:
-# GANTI <TOKEN_KAMU> dengan token login
 ###############################################
-GET http://localhost:3000/api/auth/me
+GET {{baseUrl}}/api/auth/me
 Authorization: Bearer <TOKEN_KAMU>
+Accept: application/json
+
+# Expected: 200 + user info
 
 ###############################################
 # TEST TANPA TOKEN (harus error 401)
 ###############################################
-GET http://localhost:3000/api/auth/me
+GET {{baseUrl}}/api/auth/me
+Accept: application/json
 
+# Expected: 401 Unauthorized
 
 ###############################################
 # TEST REGISTER INVALID (email/password salah)
 ###############################################
-POST http://localhost:3000/api/auth/register
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
+Accept: application/json
 
 {
   "email": "invalid-email",
   "password": "123"
 }
 
+# Expected: 400 Bad Request + validation errors
 
 ###############################################
 # TEST LOGIN PASSWORD SALAH (should 401)
 ###############################################
-POST http://localhost:3000/api/auth/login
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
+Accept: application/json
 
 {
   "email": "test@mail.com",
   "password": "wrongpassword"
 }
+
+# Expected: 401 Unauthorized (or 400 depending impl)
