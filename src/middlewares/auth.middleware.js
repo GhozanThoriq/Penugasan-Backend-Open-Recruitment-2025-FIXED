@@ -1,19 +1,17 @@
+// src/middlewares/auth.middleware.js
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: 'No token' });
+  const header = req.headers.authorization;
+  if (!header || !header.startsWith('Bearer ')) return res.status(401).json({ message: 'No token' });
 
-  const parts = authHeader.split(' ');
-  if (parts.length !== 2) return res.status(401).json({ message: 'Bad token format' });
-
-  const token = parts[1];
+  const token = header.split(' ')[1];
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = payload.sub;
-    req.userRole = payload.role;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decoded.sub;
+    req.userRole = decoded.role;
     next();
   } catch (err) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
+    return res.status(401).json({ message: 'Invalid token' });
   }
 };

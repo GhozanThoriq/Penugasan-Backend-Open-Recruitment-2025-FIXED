@@ -1,24 +1,26 @@
+// src/routes/auth.routes.js
 const express = require('express');
 const router = express.Router();
+const authCtrl = require('../controllers/auth.controller');
+const authMiddleware = require('../middlewares/auth.middleware'); // your middleware for access token
 const rateLimit = require('express-rate-limit');
-const { register, login, me } = require('../controllers/auth.controller');
-const authMiddleware = require('../middlewares/auth.middleware');
-const { registerValidator, loginValidator } = require('../middlewares/validators');
 
-// Limiter khusus untuk login
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5, // cuma 5 percobaan login per 15 menit
-  message: { message: 'Too many login attempts. Try again later.' }
-});
+// login limiter already in your code; reuse if needed
 
-// Register
-router.post('/register', registerValidator, register);
+router.post('/register', authCtrl.register);
+router.post('/login', authCtrl.login);
 
-// Login
-router.post('/login', loginLimiter, loginValidator, login);
+// refresh token
+router.post('/refresh', authCtrl.refresh);
 
-// Get my info
-router.get('/me', authMiddleware, me);
+// logout / revoke
+router.post('/logout', authCtrl.logout);
+
+// password reset flows
+router.post('/request-reset', authCtrl.requestPasswordReset);
+router.post('/reset-password', authCtrl.resetPassword);
+
+// me
+router.get('/me', authMiddleware, authCtrl.me);
 
 module.exports = router;

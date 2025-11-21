@@ -1,31 +1,19 @@
 @baseUrl = http://localhost:3000
 @token =
+@refreshToken =
+
 # =====================================================================
-# REST CLIENT API TEST SUITE
-# Gunakan VSCode REST Client
-#
-# Pastikan kamu sudah memilih environment:
-#   Ctrl + Shift + P → "Rest Client: Switch Environment" → pilih "local"
-#
-# baseUrl diambil dari .rest-client.env.json
+# REST CLIENT API TEST SUITE (updated)
+# - Jika pakai .rest-client.env.json: pastikan environment "local" aktif.
+# - Setelah login: copy token -> .rest-client.env.json "token": "<JWT>"
+#   atau edit baris @token di atas untuk testing cepat.
 # =====================================================================
 
-
-#########################################################
-# 1) ROOT TEST (Server Hidup?)
-#########################################################
+### 1) ROOT TEST (Server Hidup?)
 GET {{baseUrl}}/
 Accept: application/json
 
-# Expected: 200 OK
-# Response example:
-# { "message": "API Works!" }
-
-
-
-#########################################################
-# 2) REGISTER (buat user baru)
-#########################################################
+### 2) REGISTER (buat user baru)
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 Accept: application/json
@@ -35,14 +23,7 @@ Accept: application/json
   "password": "password123"
 }
 
-# Expected: 200 / 201
-# Jika email duplicate → 400 / 409
-
-
-
-#########################################################
-# 3) LOGIN (ambil JWT token)
-#########################################################
+### 3) LOGIN (ambil JWT token + refreshToken)
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 Accept: application/json
@@ -52,36 +33,59 @@ Accept: application/json
   "password": "password123"
 }
 
-# Expected: 200 OK
-# Response body: { "token": "..." }
-# Copy token lalu masukkan ke:
-# .rest-client.env.json → "token": "<JWT>" 
+# Expected response: { "token": "<JWT>", "refreshToken": "<REFRESH>" }
+# Copy values and simpan ke .rest-client.env.json OR ganti baris @token/@refreshToken di atas
 
+### 4) REFRESH TOKEN (dapatkan access token baru)
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: application/json
+Accept: application/json
 
-#########################################################
-# 4) ME (Protected Route — pakai token)
-#########################################################
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 5) LOGOUT (revoke refresh token)
+POST {{baseUrl}}/api/auth/logout
+Content-Type: application/json
+Accept: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 6) REQUEST RESET (generate reset token — returned in response for testing)
+POST {{baseUrl}}/api/auth/request-reset
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "test@mail.com"
+}
+
+# The response will include the plain reset token (in this implementation).
+# Copy that token for the reset step below.
+
+### 7) RESET PASSWORD (pakai token dari request-reset)
+POST {{baseUrl}}/api/auth/reset-password
+Content-Type: application/json
+Accept: application/json
+
+{
+  "token": "<PASTE_RESET_TOKEN_FROM_REQUEST_RESET>",
+  "password": "newPassword123"
+}
+
+### 8) ME (Protected Route — pakai access token)
 GET {{baseUrl}}/api/auth/me
 Authorization: Bearer {{token}}
 Accept: application/json
 
-# Expected: 200 OK + user info
-
-
-
-#########################################################
-# 5) NEGATIVE — tanpa token (HARUS error)
-#########################################################
+### 9) NEGATIVE — tanpa token (HARUS error)
 GET {{baseUrl}}/api/auth/me
 Accept: application/json
 
-# Expected: 401 Unauthorized
-
-
-
-#########################################################
-# 6) NEGATIVE — Register invalid
-#########################################################
+### 10) NEGATIVE — Register invalid
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 Accept: application/json
@@ -91,13 +95,7 @@ Accept: application/json
   "password": "123"
 }
 
-# Expected: 400 Bad Request (validasi)
-
-
-
-#########################################################
-# 7) NEGATIVE — Password salah (login gagal)
-#########################################################
+### 11) NEGATIVE — Login dengan password salah
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 Accept: application/json
@@ -107,26 +105,13 @@ Accept: application/json
   "password": "wrongpassword"
 }
 
-# Expected: 401 Unauthorized
-
-
-
-#########################################################
-# 8) NEGATIVE — Token invalid
-#########################################################
+### 12) NEGATIVE — Token invalid
 GET {{baseUrl}}/api/auth/me
 Authorization: Bearer invalid.token.here
 Accept: application/json
 
-# Expected: 401 Unauthorized
-
-
-
-#########################################################
-# 9) Rate-limit test (opsional)
-#########################################################
-# Kirim 6x request berikut dalam waktu 10–15 detik
-
+### 13) RATE-LIMIT TEST (opsional)
+# Kirim request login (wrong password) berkali-kali cepat untuk memicu limiter
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 Accept: application/json
@@ -135,5 +120,3 @@ Accept: application/json
   "email": "test@mail.com",
   "password": "wrongpassword"
 }
-
-# Expected: 429 Too Many Requests (kalau limiter aktif)
