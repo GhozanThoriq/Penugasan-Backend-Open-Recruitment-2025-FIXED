@@ -1,77 +1,139 @@
-File ini digunakan untuk menguji API menggunakan ekstensi VS Code REST Client.
+@baseUrl = http://localhost:3000
+@token =
+# =====================================================================
+# REST CLIENT API TEST SUITE
+# Gunakan VSCode REST Client
+#
+# Pastikan kamu sudah memilih environment:
+#   Ctrl + Shift + P → "Rest Client: Switch Environment" → pilih "local"
+#
+# baseUrl diambil dari .rest-client.env.json
+# =====================================================================
 
-Environment note:
-Pastikan kamu sudah memilih Environment 'local' di kanan bawah VS Code.
-Base URL diambil dari variabel 'baseUrl' di .rest-client.env.json
 
-@baseUrl = {{baseUrl}}
-
-1. ROOT TEST (Cek Server Hidup)
-
+#########################################################
+# 1) ROOT TEST (Server Hidup?)
+#########################################################
 GET {{baseUrl}}/
 Accept: application/json
 
-Expected: 200 OK, response: { "message": "API Works! (Health Check OK)" }
+# Expected: 200 OK
+# Response example:
+# { "message": "API Works!" }
 
-2. REGISTER (Buat Akun Baru)
+
+
+#########################################################
+# 2) REGISTER (buat user baru)
+#########################################################
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 Accept: application/json
+
 {
   "email": "test@mail.com",
   "password": "password123"
 }
 
-Expected: 201 Created atau 200 OK. Response: { user: {...} } atau { message: "..." }
+# Expected: 200 / 201
+# Jika email duplicate → 400 / 409
 
-###############################################
-REQUEST SENSITIF BERIKUT AKAN MENGGANTUNGKAN PADA TOKEN
-PASTIKAN KAMU SUDAH MENGATUR SCRIPT OTOMATIS DI POSTMAN COLLECTION
-###############################################
-3. LOGIN (Dapatkan Bearer Token)
+
+
+#########################################################
+# 3) LOGIN (ambil JWT token)
+#########################################################
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 Accept: application/json
+
 {
   "email": "test@mail.com",
   "password": "password123"
 }
 
-Expected: 200 OK. Response body: { "token": "..." }
-Catatan: Jika menggunakan .rest-client.env.json, kamu harus memasukkan token manual ke dalamnya.
+# Expected: 200 OK
+# Response body: { "token": "..." }
+# Copy token lalu masukkan ke:
+# .rest-client.env.json → "token": "<JWT>" 
 
-4. ME (Protected Route - Akses dengan Token Manual)
-NOTE: GANTI <TOKEN_KAMU> DENGAN TOKEN JWT HASIL LOGIN!
+
+#########################################################
+# 4) ME (Protected Route — pakai token)
+#########################################################
 GET {{baseUrl}}/api/auth/me
-Authorization: Bearer <TOKEN_KAMU>
+Authorization: Bearer {{token}}
 Accept: application/json
-Expected: 200 OK + Informasi pengguna.
 
-###############################################
-NEGATIVE TESTING 
-###############################################
-5. TEST TANPA TOKEN (Harus Error 401 Unauthorized)
+# Expected: 200 OK + user info
+
+
+
+#########################################################
+# 5) NEGATIVE — tanpa token (HARUS error)
+#########################################################
 GET {{baseUrl}}/api/auth/me
 Accept: application/json
-Expected: 401 Unauthorized (atau 403 Forbidden)
 
-6. TEST REGISTER INVALID (Email/Password Salah)
+# Expected: 401 Unauthorized
+
+
+
+#########################################################
+# 6) NEGATIVE — Register invalid
+#########################################################
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 Accept: application/json
+
 {
   "email": "invalid-email",
   "password": "123"
 }
 
-Expected: 400 Bad Request + pesan validasi
-7. TEST LOGIN PASSWORD SALAH (Harus Error 401)
+# Expected: 400 Bad Request (validasi)
+
+
+
+#########################################################
+# 7) NEGATIVE — Password salah (login gagal)
+#########################################################
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 Accept: application/json
+
 {
   "email": "test@mail.com",
   "password": "wrongpassword"
 }
 
-Expected: 401 Unauthorized atau 400 Bad Request
+# Expected: 401 Unauthorized
+
+
+
+#########################################################
+# 8) NEGATIVE — Token invalid
+#########################################################
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer invalid.token.here
+Accept: application/json
+
+# Expected: 401 Unauthorized
+
+
+
+#########################################################
+# 9) Rate-limit test (opsional)
+#########################################################
+# Kirim 6x request berikut dalam waktu 10–15 detik
+
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "test@mail.com",
+  "password": "wrongpassword"
+}
+
+# Expected: 429 Too Many Requests (kalau limiter aktif)
