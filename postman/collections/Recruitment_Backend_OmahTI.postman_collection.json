@@ -1,0 +1,250 @@
+{
+  "info": {
+    "_postman_id": "f1ddbc2e-947e-46bf-8788-84f1bdde6ff0",
+    "name": "Recruitment_Backend_OmahTI",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50260190",
+    "_collection_link": "https://thoriumxt-3585622.postman.co/workspace/b33b0a82-0675-4f2f-8bfa-64a024ad3416/collection/50260190-f1ddbc2e-947e-46bf-8788-84f1bdde6ff0?action=share&source=collection_link&creator=50260190"
+  },
+  "item": [
+    {
+      "name": "Root - Health",
+      "id": "719df99c-8648-48a8-aac9-35cf8381bc52",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register",
+      "id": "1d27ceb3-5542-479f-9e21-247836487172",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"tes123t@mail.com\",\r\n    \"Password\": \"password3423423\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "fc2ca37b-8006-46d2-8020-af6fa00a1a8c",
+            "exec": [
+              "const res = pm.response.json();\r",
+              "if (res.token) pm.environment.set(\"token\", res.token);\r",
+              "if (res.refreshToken) pm.environment.set(\"refreshToken\", res.refreshToken);\r",
+              "pm.test(\"Login OK & token saved\", () => {\r",
+              "  pm.expect(res.token).to.exist;\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "a4dd5f21-c904-4d30-8aae-2a4ee50d12d3",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"tes@mail.com\",\r\n  \"password\": \"password123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Access Protected Route",
+      "id": "7f22d650-7b4b-4e2f-a296-76bde97a9221",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Refresh Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "54968177-aa20-4d5a-9baf-99f56f7f7c55",
+            "exec": [
+              "const r = pm.response.json();\r",
+              "if (r.token) pm.environment.set(\"token\", r.token);\r",
+              "if (r.refreshToken) pm.environment.set(\"refreshToken\", r.refreshToken);\r",
+              "pm.test(\"Refreshed\", () => pm.expect(r.token).to.exist);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "packages": {},
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "03351880-46eb-4344-9e53-a7944c29cabd",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"refreshToken\": \"{{refreshToken}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/refresh",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "refresh"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Logout",
+      "id": "66aa7f5b-443b-404e-8bd3-419cdf0331af",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"refreshToken\": \"{{refreshToken}}\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/logout",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "logout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Request Reset",
+      "id": "6da48284-c375-451b-9c3a-69b115d61287",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"tes@mail.com\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/request-reset",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "request-reset"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Reset Password",
+      "id": "9a250582-cf15-44ea-9183-8a2bdb359835",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"token\": \"{{resetToken}}\",\r\n  \"password\": \"newPassword123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/reset-password",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "reset-password"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
