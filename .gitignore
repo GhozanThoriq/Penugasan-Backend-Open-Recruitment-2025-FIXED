@@ -3,7 +3,8 @@ node_modules/
 
 # File environment rahasia
 .env
-
+logs/
+logs/*
 # Logs (opsional)
 npm-debug.log
 yarn-debug.log
@@ -17,4 +18,3 @@ dist/
 
 # VSCode settings (opsional biar repo bersih)
 .vscode/
-# 
