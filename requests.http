@@ -1,82 +1,77 @@
-# Environment note:
-# set baseUrl in .rest-client.env.json OR replace {{baseUrl}} with http://localhost:3000
+File ini digunakan untuk menguji API menggunakan ekstensi VS Code REST Client.
 
-###############################################
-# ROOT TEST (cek server hidup)
-###############################################
+Environment note:
+Pastikan kamu sudah memilih Environment 'local' di kanan bawah VS Code.
+Base URL diambil dari variabel 'baseUrl' di .rest-client.env.json
+
+@baseUrl = {{baseUrl}}
+
+1. ROOT TEST (Cek Server Hidup)
+
 GET {{baseUrl}}/
 Accept: application/json
 
-###############################################
-# REGISTER (buat akun baru)
-###############################################
+Expected: 200 OK, response: { "message": "API Works! (Health Check OK)" }
+
+2. REGISTER (Buat Akun Baru)
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 Accept: application/json
-
 {
   "email": "test@mail.com",
   "password": "password123"
 }
 
-# Expected: 201 or 200 (tergantung implementasi) / response body: { user: {...} } atau message
+Expected: 201 Created atau 200 OK. Response: { user: {...} } atau { message: "..." }
 
 ###############################################
-# LOGIN (dapat Bearer Token)
+REQUEST SENSITIF BERIKUT AKAN MENGGANTUNGKAN PADA TOKEN
+PASTIKAN KAMU SUDAH MENGATUR SCRIPT OTOMATIS DI POSTMAN COLLECTION
 ###############################################
+3. LOGIN (Dapatkan Bearer Token)
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 Accept: application/json
-
 {
   "email": "test@mail.com",
   "password": "password123"
 }
 
-# Expected: 200 + response body contains token (e.g. { "token": "..." })
-# Copy token from response and paste ke below request's Authorization header (or set env)
+Expected: 200 OK. Response body: { "token": "..." }
+Catatan: Jika menggunakan .rest-client.env.json, kamu harus memasukkan token manual ke dalamnya.
 
-###############################################
-# ME (Protected Route)
-###############################################
+4. ME (Protected Route - Akses dengan Token Manual)
+NOTE: GANTI <TOKEN_KAMU> DENGAN TOKEN JWT HASIL LOGIN!
 GET {{baseUrl}}/api/auth/me
 Authorization: Bearer <TOKEN_KAMU>
 Accept: application/json
-
-# Expected: 200 + user info
+Expected: 200 OK + Informasi pengguna.
 
 ###############################################
-# TEST TANPA TOKEN (harus error 401)
+NEGATIVE TESTING 
 ###############################################
+5. TEST TANPA TOKEN (Harus Error 401 Unauthorized)
 GET {{baseUrl}}/api/auth/me
 Accept: application/json
+Expected: 401 Unauthorized (atau 403 Forbidden)
 
-# Expected: 401 Unauthorized
-
-###############################################
-# TEST REGISTER INVALID (email/password salah)
-###############################################
+6. TEST REGISTER INVALID (Email/Password Salah)
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 Accept: application/json
-
 {
   "email": "invalid-email",
   "password": "123"
 }
 
-# Expected: 400 Bad Request + validation errors
-
-###############################################
-# TEST LOGIN PASSWORD SALAH (should 401)
-###############################################
+Expected: 400 Bad Request + pesan validasi
+7. TEST LOGIN PASSWORD SALAH (Harus Error 401)
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 Accept: application/json
-
 {
   "email": "test@mail.com",
   "password": "wrongpassword"
 }
 
-# Expected: 401 Unauthorized (or 400 depending impl)
+Expected: 401 Unauthorized atau 400 Bad Request
