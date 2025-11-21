@@ -3,6 +3,8 @@ node_modules/
 
 # File environment rahasia
 .env
+logs/
+logs/*
 
 # Logs (opsional)
 npm-debug.log
